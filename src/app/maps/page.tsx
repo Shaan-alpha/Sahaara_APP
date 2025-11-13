@@ -1,22 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Search, X, MapPin, Navigation } from "lucide-react";
 import Link from "next/link";
-
-declare global {
-  interface Window {
-    initMap: () => void;
-  }
-}
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 const MapsPage = () => {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
   const [isOrange, setIsOrange] = useState(false);
-
-
-  
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<maplibregl.Map | null>(null);
+  const marker = useRef<maplibregl.Marker | null>(null);
 
   useEffect(() => {
     // Get the user's current position
@@ -28,31 +23,82 @@ const MapsPage = () => {
           setLatitude(lat);
           setLongitude(lng);
 
-          // Initialize the map once the latitude and longitude are obtained
-          window.initMap = () => {
-            const mapOptions = {
-              center: { lat, lng },
+          // Initialize MapLibre GL map
+          if (mapContainer.current && !map.current) {
+            map.current = new maplibregl.Map({
+              container: mapContainer.current,
+              style: {
+                version: 8,
+                sources: {
+                  osm: {
+                    type: 'raster',
+                    tiles: [
+                      'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    ],
+                    tileSize: 256,
+                    attribution: '&copy; OpenStreetMap Contributors',
+                  },
+                },
+                layers: [
+                  {
+                    id: 'osm',
+                    type: 'raster',
+                    source: 'osm',
+                  },
+                ],
+              },
+              center: [lng, lat],
               zoom: 15,
-            };
-            const newMap = new google.maps.Map(
-              document.getElementById("map") as HTMLElement,
-              mapOptions
-            );
-            setMap(newMap);
-
-            // Add a marker at the user's current location
-            new google.maps.Marker({
-              position: { lat, lng },
-              map: newMap,
-              title: "Your Location",
             });
-          };
 
-          // Load the Google Maps script
-          const script = document.createElement("script");
-          script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAPdZyN4RKJKbZeZ7aaVPGWuW-eUzTmOJg&callback=initMap`;
-          script.defer = true;
-          document.head.appendChild(script);
+            // Add navigation controls
+            map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+            // Add marker at user's current location
+            marker.current = new maplibregl.Marker({ color: '#3b82f6' })
+              .setLngLat([lng, lat])
+              .setPopup(new maplibregl.Popup().setHTML('<p>Your Location</p>'))
+              .addTo(map.current);
+
+            // Add 50m radius circle for geofencing visualization
+            map.current.on('load', () => {
+              if (map.current) {
+                map.current.addSource('radius', {
+                  type: 'geojson',
+                  data: {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                      type: 'Point',
+                      coordinates: [lng, lat],
+                    },
+                  },
+                });
+
+                // Add circle layer (50m radius visualization)
+                map.current.addLayer({
+                  id: 'radius-circle',
+                  type: 'circle',
+                  source: 'radius',
+                  paint: {
+                    'circle-radius': [
+                      'interpolate',
+                      ['exponential', 2],
+                      ['zoom'],
+                      0, 0,
+                      20, 50
+                    ],
+                    'circle-color': '#3b82f6',
+                    'circle-opacity': 0.2,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#3b82f6',
+                  },
+                });
+              }
+            });
+          }
         },
         (error) => {
           console.error("Error fetching location: ", error);
@@ -61,14 +107,21 @@ const MapsPage = () => {
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
+
+    // Cleanup on unmount
+    return () => {
+      if (map.current) {
+        map.current.remove();
+      }
+    };
   }, []);
 
   return (
     <div className="bg-white h-screen flex flex-col overflow-hidden shadow-lg">
       {/* Map Container */}
       <div className="relative flex-grow ">
-        {/* Google Map */}
-        <div id="map" style={{ height: "100%", width: "100%" }}></div>
+        {/* MapLibre GL Map */}
+        <div ref={mapContainer} style={{ height: "100%", width: "100%" }}></div>
 
         {/* Top controls */}
         <div className="absolute top-4 left-4 right-4 flex justify-between">
