@@ -18,10 +18,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Only return notifications from the last 2 days
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
     let query = supabase
       .from('notifications')
       .select('*')
       .eq('receiver_id', user_id)
+      .gte('created_at', twoDaysAgo.toISOString())
       .order('created_at', { ascending: false });
 
     if (unread_only) {
@@ -139,6 +144,44 @@ export async function PATCH(request: NextRequest) {
 
   } catch (error) {
     console.error('Error in notification update:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE /api/notifications
+ * Remove notifications older than 2 days
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+    const { data, error } = await supabase
+      .from('notifications')
+      .delete()
+      .lt('created_at', twoDaysAgo.toISOString())
+      .select();
+
+    if (error) {
+      console.error('Error deleting old notifications:', error);
+      return NextResponse.json(
+        { error: 'Failed to delete old notifications' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Deleted ${data?.length || 0} notification(s) older than 2 days`,
+      deleted_count: data?.length || 0,
+    });
+
+  } catch (error) {
+    console.error('Error in notification cleanup:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AUTH",
-  description: "AUTH using OTP and Twilio",
+  title: "Saharaa",
+  description: "Saharaa",
 };
 
 export default function RootLayout({

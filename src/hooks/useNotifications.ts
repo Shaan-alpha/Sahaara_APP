@@ -5,8 +5,12 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 /**
  * Custom hook for managing real-time notifications
  * @param user_id User's unique identifier
+ * @param onNewNotification Optional callback fired when a new SOS arrives in real-time
  */
-export function useNotifications(user_id: string | null) {
+export function useNotifications(
+  user_id: string | null,
+  onNewNotification?: (notification: SaharaNotification) => void
+) {
   const [notifications, setNotifications] = useState<SaharaNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -20,13 +24,33 @@ export function useNotifications(user_id: string | null) {
 
     let channel: RealtimeChannel | null = null;
 
-    // Fetch initial notifications
+    // Delete notifications older than 2 days from the database
+    const cleanupOldNotifications = async () => {
+      try {
+        const twoDaysAgo = new Date();
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+        await supabase
+          .from('notifications')
+          .delete()
+          .eq('receiver_id', user_id)
+          .lt('created_at', twoDaysAgo.toISOString());
+      } catch (err) {
+        console.error('Error cleaning up old notifications:', err);
+      }
+    };
+
+    // Fetch initial notifications (only last 2 days)
     const fetchNotifications = async () => {
       try {
+        const twoDaysAgo = new Date();
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
         const { data, error } = await supabase
           .from('notifications')
           .select('*')
           .eq('receiver_id', user_id)
+          .gte('created_at', twoDaysAgo.toISOString())
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -41,6 +65,7 @@ export function useNotifications(user_id: string | null) {
       }
     };
 
+    cleanupOldNotifications();
     fetchNotifications();
 
     // Subscribe to real-time notifications
@@ -59,14 +84,19 @@ export function useNotifications(user_id: string | null) {
           setNotifications((prev) => [newNotification, ...prev]);
           setUnreadCount((prev) => prev + 1);
 
-          // Show browser notification if permitted
+          // Fire callback so parent can show popup / play sound
+          onNewNotification?.(newNotification);
+
+          // Show browser notification if permitted (enhanced: won't auto-dismiss)
           if (typeof window !== 'undefined' && 'Notification' in window) {
             const BrowserNotification = window.Notification;
             if (BrowserNotification.permission === 'granted') {
               new BrowserNotification('🆘 Sahara Emergency Alert', {
-                body: newNotification.message,
+                body: `${newNotification.sender_name} needs help nearby! ${newNotification.message}`,
                 icon: '/icon.png',
                 badge: '/badge.png',
+                requireInteraction: true,
+                tag: `sos-${newNotification.id}`,
               });
             }
           }
@@ -108,7 +138,7 @@ export function useNotifications(user_id: string | null) {
         supabase.removeChannel(channel);
       }
     };
-  }, [user_id]);
+  }, [user_id, onNewNotification]);
 
   const markAsRead = async (notification_id: string) => {
     try {

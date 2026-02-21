@@ -67,10 +67,15 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "emergency-pulse": {
+          "0%, 100%": { backgroundColor: "rgba(220, 38, 38, 0.90)" },
+          "50%": { backgroundColor: "rgba(185, 28, 28, 0.95)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "emergency-pulse": "emergency-pulse 1.5s ease-in-out infinite",
       },
     },
   },

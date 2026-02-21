@@ -31,21 +31,21 @@ const MapsPage = () => {
                 version: 8,
                 sources: {
                   osm: {
-                    type: 'raster',
+                    type: "raster",
                     tiles: [
-                      'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     ],
                     tileSize: 256,
-                    attribution: '&copy; OpenStreetMap Contributors',
+                    attribution: "&copy; OpenStreetMap Contributors",
                   },
                 },
                 layers: [
                   {
-                    id: 'osm',
-                    type: 'raster',
-                    source: 'osm',
+                    id: "osm",
+                    type: "raster",
+                    source: "osm",
                   },
                 ],
               },
@@ -54,24 +54,27 @@ const MapsPage = () => {
             });
 
             // Add navigation controls
-            map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+            map.current.addControl(
+              new maplibregl.NavigationControl(),
+              "top-right",
+            );
 
             // Add marker at user's current location
-            marker.current = new maplibregl.Marker({ color: '#3b82f6' })
+            marker.current = new maplibregl.Marker({ color: "#3b82f6" })
               .setLngLat([lng, lat])
-              .setPopup(new maplibregl.Popup().setHTML('<p>Your Location</p>'))
+              .setPopup(new maplibregl.Popup().setHTML("<p>Your Location</p>"))
               .addTo(map.current);
 
             // Add 50m radius circle for geofencing visualization
-            map.current.on('load', () => {
+            map.current.on("load", () => {
               if (map.current) {
-                map.current.addSource('radius', {
-                  type: 'geojson',
+                map.current.addSource("radius", {
+                  type: "geojson",
                   data: {
-                    type: 'Feature',
+                    type: "Feature",
                     properties: {},
                     geometry: {
-                      type: 'Point',
+                      type: "Point",
                       coordinates: [lng, lat],
                     },
                   },
@@ -79,21 +82,23 @@ const MapsPage = () => {
 
                 // Add circle layer (50m radius visualization)
                 map.current.addLayer({
-                  id: 'radius-circle',
-                  type: 'circle',
-                  source: 'radius',
+                  id: "radius-circle",
+                  type: "circle",
+                  source: "radius",
                   paint: {
-                    'circle-radius': [
-                      'interpolate',
-                      ['exponential', 2],
-                      ['zoom'],
-                      0, 0,
-                      20, 50
+                    "circle-radius": [
+                      "interpolate",
+                      ["exponential", 2],
+                      ["zoom"],
+                      0,
+                      0,
+                      20,
+                      50,
                     ],
-                    'circle-color': '#3b82f6',
-                    'circle-opacity': 0.2,
-                    'circle-stroke-width': 2,
-                    'circle-stroke-color': '#3b82f6',
+                    "circle-color": "#3b82f6",
+                    "circle-opacity": 0.2,
+                    "circle-stroke-width": 2,
+                    "circle-stroke-color": "#3b82f6",
                   },
                 });
               }
@@ -102,7 +107,7 @@ const MapsPage = () => {
         },
         (error) => {
           console.error("Error fetching location: ", error);
-        }
+        },
       );
     } else {
       console.error("Geolocation is not supported by this browser.");
@@ -117,90 +122,111 @@ const MapsPage = () => {
   }, []);
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden shadow-lg">
-      {/* Map Container */}
-      <div className="relative flex-grow ">
-        {/* MapLibre GL Map */}
-        <div ref={mapContainer} style={{ height: "100%", width: "100%" }}></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-200 via-blue-50 to-indigo-100 flex items-center justify-center p-0 sm:p-6 lg:p-10">
+      <div className="relative flex flex-col w-full sm:max-w-[390px] h-screen sm:h-[820px] bg-white sm:rounded-[2.5rem] sm:shadow-2xl sm:overflow-hidden">
+        {/* Map fills upper portion */}
+        <div className="relative flex-grow min-h-0">
+          {/* MapLibre GL Map */}
+          <div ref={mapContainer} style={{ height: "100%", width: "100%" }} />
 
-        {/* Top controls */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between">
-          <Link href="/">
-            <button className="p-2 bg-white rounded-full shadow">
-              <X size={20} />
-            </button>
-          </Link>
-          <div className="flex space-x-2">
-            <button className="p-2 bg-white rounded-full shadow">
-              <MapPin size={20} />
-            </button>
-            <button className="p-2 bg-white rounded-full shadow">
-              <Navigation size={20} />
-            </button>
-          </div>
-        </div>
-
-
-        {/* yello marker  */}
-        <div  className={`orangemaps ${isOrange?"block":"hidden"} h-40 w-40 transition-all duration-1000 absolute top-[35%] left-[30%] rounded-full bg-orange-300/50`}></div>
-
-        {/* Temperature */}
-        <div className="absolute bottom-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-semibold shadow">
-          16°
-        </div>
-      </div>
-
-      {/* Bottom panel */}
-      <div className="bg-white p-4 rounded-t-3xl -mt-4 shadow-lg">
-        {/* Search bar */}
-        <div className="flex items-center bg-gray-100 rounded-full px-4 py-3 mt-2  mb-4">
-          <Search size={20} className="text-gray-400 mr-2" />
-          <input
-            type="text"
-            placeholder="Search Maps"
-            className="bg-transparent outline-none flex-grow"
+          {/* Orange zone overlay */}
+          <div
+            className={`orangemaps ${isOrange ? "block" : "hidden"} h-40 w-40 transition-all duration-1000 absolute top-[35%] left-[30%] rounded-full bg-orange-300/50`}
           />
-          <button className="text-gray-400 font-semibold">AA</button>
-        </div>
 
-        {/* Orange Zone */}
-        <div className={`${isOrange ? "block" : "hidden"}`}>
-          <h3 className="text-sm font-semibold mb-2">Mark Orange Zone</h3>
-          <div className="flex items-center bg-orange-100 p-3 rounded-lg">
-            <div className="bg-orange-500 rounded-full p-2 mr-3">
-              <MapPin size={20} className="text-white" />
+          {/* ── Top controls ── */}
+          <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none">
+            {/* Back */}
+            <Link href="/" className="pointer-events-auto">
+              <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white active:scale-95 transition-all">
+                <X size={18} className="text-gray-700" />
+              </button>
+            </Link>
+            {/* Right cluster */}
+            <div className="flex flex-col gap-2 pointer-events-auto">
+              <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white active:scale-95 transition-all">
+                <MapPin size={18} className="text-gray-700" />
+              </button>
+              <button className="w-10 h-10 bg-blue-600 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all">
+                <Navigation size={18} className="text-white" />
+              </button>
             </div>
-            <div>
-              <p className="font-semibold">Orange Zone</p>
-              <p className="text-sm text-gray-600">
-                This area is marked as Orange
-              </p>
-            </div>
+          </div>
+
+          {/* Temperature badge */}
+          <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-bold shadow-md text-gray-700">
+            16° ☀️
           </div>
         </div>
 
-        {/* Mark orange Zone */}
-        <div className={`${isOrange ? "hidden" : "block"}`}>
-          <button
-            onClick={() => setIsOrange(!isOrange)}
-            className="bg-orange-500/40 text-white px-4 py-2 rounded-lg font-semibold"
-          >
-            Feeling Unsafe Mark it Orange
-          </button>
-        </div>
+        {/* ── Bottom sheet ── */}
+        <div className="bg-white rounded-t-[2rem] -mt-6 shadow-2xl px-5 pt-3 pb-5 border-t border-gray-100 safe-pb shrink-0">
+          {/* Drag handle */}
+          <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
 
-        {/* Siri Suggestions */}
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold mb-2">Siri Suggestions</h3>
-          <div className="flex items-center bg-blue-100 p-3 rounded-lg">
-            <div className="bg-blue-500 rounded-full p-2 mr-3">
-              <MapPin size={20} className="text-white" />
+          {/* Search bar */}
+          <div className="flex items-center bg-gray-100 rounded-2xl px-4 py-3 mb-4 focus-within:ring-2 focus-within:ring-blue-400 transition-all">
+            <Search size={18} className="text-gray-400 mr-2.5 shrink-0" />
+            <input
+              type="text"
+              placeholder="Search Maps"
+              className="bg-transparent outline-none flex-grow text-sm text-gray-700 placeholder-gray-400"
+            />
+            <button className="text-gray-400 font-semibold text-sm hover:text-gray-600 transition-colors">
+              AA
+            </button>
+          </div>
+
+          {/* Orange Zone active */}
+          <div className={`${isOrange ? "block" : "hidden"} mb-3`}>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+              Active Zone
+            </h3>
+            <div className="flex items-center gap-3 p-3.5 bg-orange-50 border border-orange-200 rounded-2xl">
+              <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+                <MapPin size={18} className="text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-orange-800 text-sm">
+                  Orange Zone
+                </p>
+                <p className="text-xs text-orange-500">
+                  This area is marked as unsafe
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold">Parked Car</p>
-              <p className="text-sm text-gray-600">
-                290 m away, near ulica Krasnoarmejska
-              </p>
+          </div>
+
+          {/* Mark orange Zone button */}
+          <div className={`${isOrange ? "hidden" : "block"} mb-3`}>
+            <button
+              onClick={() => setIsOrange(!isOrange)}
+              className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-600 hover:to-amber-500 text-white rounded-2xl font-semibold text-sm shadow-md active:scale-[0.97] transition-all"
+            >
+              <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+                ⚠️
+              </div>
+              <span>Feeling Unsafe? Mark it Orange</span>
+            </button>
+          </div>
+
+          {/* Siri Suggestions */}
+          <div>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+              Nearby
+            </h3>
+            <div className="flex items-center gap-3 p-3.5 bg-blue-50 border border-blue-100 rounded-2xl">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+                <MapPin size={18} className="text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800 text-sm">
+                  Parked Car
+                </p>
+                <p className="text-xs text-gray-500">
+                  290 m away, near ulica Krasnoarmejska
+                </p>
+              </div>
             </div>
           </div>
         </div>
