@@ -9,13 +9,14 @@ import { calculateDistance } from '@/lib/haversine';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const defaultRadius = Number(process.env.NEXT_PUBLIC_TRACKING_RADIUS) || 500;
     const {
       user_id,
       name,
       phone,
       latitude,
       longitude,
-      radius = 50,
+      radius = defaultRadius,
       message = 'Someone needs your help nearby!'
     } = body;
 

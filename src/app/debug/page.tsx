@@ -96,7 +96,7 @@ export default function DebugPage() {
         body: JSON.stringify({
           latitude: location.latitude,
           longitude: location.longitude,
-          radius: 50,
+          radius: Number(process.env.NEXT_PUBLIC_TRACKING_RADIUS) || 500,
           exclude_user_id: userId,
         }),
       });

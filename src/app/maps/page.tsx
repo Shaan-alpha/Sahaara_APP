@@ -65,7 +65,8 @@ const MapsPage = () => {
               .setPopup(new maplibregl.Popup().setHTML("<p>Your Location</p>"))
               .addTo(map.current);
 
-            // Add 50m radius circle for geofencing visualization
+            // Add radius circle for geofencing visualization
+            const trackingRadius = Number(process.env.NEXT_PUBLIC_TRACKING_RADIUS) || 500;
             map.current.on("load", () => {
               if (map.current) {
                 map.current.addSource("radius", {
@@ -80,7 +81,7 @@ const MapsPage = () => {
                   },
                 });
 
-                // Add circle layer (50m radius visualization)
+                // Add circle layer (radius visualization)
                 map.current.addLayer({
                   id: "radius-circle",
                   type: "circle",
@@ -93,7 +94,7 @@ const MapsPage = () => {
                       0,
                       0,
                       20,
-                      50,
+                      trackingRadius,
                     ],
                     "circle-color": "#3b82f6",
                     "circle-opacity": 0.2,

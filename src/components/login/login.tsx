@@ -186,7 +186,7 @@ export default function SaharaApp() {
           body: JSON.stringify({
             latitude: location.latitude,
             longitude: location.longitude,
-            radius: 200,
+            radius: Number(process.env.NEXT_PUBLIC_TRACKING_RADIUS) || 500,
             exclude_user_id: currentUser.id,
           }),
         });
@@ -225,7 +225,7 @@ export default function SaharaApp() {
           phone: currentUser.phone,
           latitude: location.latitude,
           longitude: location.longitude,
-          radius: 50, // 50 meters
+          radius: Number(process.env.NEXT_PUBLIC_TRACKING_RADIUS) || 500,
           message: "Someone needs your help nearby!",
         }),
       });
