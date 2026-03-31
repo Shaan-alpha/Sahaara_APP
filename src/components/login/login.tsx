@@ -186,7 +186,7 @@ export default function SaharaApp() {
           body: JSON.stringify({
             latitude: location.latitude,
             longitude: location.longitude,
-            radius: 50,
+            radius: 200,
             exclude_user_id: currentUser.id,
           }),
         });
