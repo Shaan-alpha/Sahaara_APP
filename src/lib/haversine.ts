@@ -10,7 +10,7 @@ export function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ): number {
   const R = 6371e3; // Earth's radius in meters
   const φ1 = (lat1 * Math.PI) / 180; // Convert latitude to radians
@@ -39,7 +39,7 @@ export function findUsersWithinRadius(
   centerLat: number,
   centerLon: number,
   users: Array<{ latitude: number; longitude: number; [key: string]: any }>,
-  radiusInMeters: number = 50
+  radiusInMeters: number = 50,
 ): Array<{ distance: number; [key: string]: any }> {
   return users
     .map((user) => ({
@@ -48,7 +48,7 @@ export function findUsersWithinRadius(
         centerLat,
         centerLon,
         user.latitude,
-        user.longitude
+        user.longitude,
       ),
     }))
     .filter((user) => user.distance <= radiusInMeters)
