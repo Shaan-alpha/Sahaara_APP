@@ -9,7 +9,7 @@ import { calculateDistance } from '@/lib/haversine';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { latitude, longitude, radius = 50, exclude_user_id } = body;
+    const { latitude, longitude, radius = 200, exclude_user_id } = body;
 
     // Validate required fields
     if (latitude === undefined || longitude === undefined) {
