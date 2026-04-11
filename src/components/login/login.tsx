@@ -505,7 +505,7 @@ export default function SaharaApp() {
             <p className="text-center text-xs text-gray-500 font-medium">
               SOS reaches everyone within{" "}
               <strong className="text-gray-700">
-                {process.env.NEXT_PUBLIC_TRACKING_RADIUS}
+                {process.env.NEXT_PUBLIC_TRACKING_RADIUS}mt
               </strong>
             </p>
           </div>
