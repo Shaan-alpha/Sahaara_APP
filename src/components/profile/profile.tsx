@@ -1,7 +1,8 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bell,
+  Check,
   ChevronRight,
   Edit,
   HelpCircle,
@@ -10,6 +11,7 @@ import {
   Shield,
   User,
   Users,
+  X,
 } from "lucide-react";
 import { MapPin, Send, Home, Calendar, UserCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -52,7 +54,58 @@ const ProfileOption: React.FC<ProfileOptionProps> = ({
   </div>
 );
 
+const DEFAULT_NAME = "Suhani";
+const DEFAULT_USERNAME = "suhani679";
+const STORAGE_KEY = "sahara.profile";
+
 const ProfilePage = () => {
+  const [name, setName] = useState(DEFAULT_NAME);
+  const [username, setUsername] = useState(DEFAULT_USERNAME);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftName, setDraftName] = useState(DEFAULT_NAME);
+  const [draftUsername, setDraftUsername] = useState(DEFAULT_USERNAME);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          name?: string;
+          username?: string;
+        };
+        if (parsed.name) setName(parsed.name);
+        if (parsed.username) setUsername(parsed.username);
+      }
+    } catch {}
+    setHydrated(true);
+  }, []);
+
+  const startEdit = () => {
+    setDraftName(name);
+    setDraftUsername(username);
+    setIsEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const saveEdit = () => {
+    const trimmedName = draftName.trim() || DEFAULT_NAME;
+    const trimmedUsername =
+      draftUsername.trim().replace(/^@+/, "") || DEFAULT_USERNAME;
+    setName(trimmedName);
+    setUsername(trimmedUsername);
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ name: trimmedName, username: trimmedUsername }),
+      );
+    } catch {}
+    setIsEditing(false);
+  };
+
   return (
     /* Desktop: phone-frame centered. Mobile: full screen. */
     <div className="min-h-screen bg-gradient-to-br from-slate-200 via-blue-50 to-indigo-100 flex items-center justify-center p-0 sm:p-6 lg:p-10">
@@ -88,22 +141,81 @@ const ProfilePage = () => {
                 <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full shadow" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-bold text-white truncate">
-                  Suhani
-                </h2>
-                <p className="text-blue-200 text-sm font-medium">@suhani679</p>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <div className="bg-white/20 px-2 py-0.5 rounded-full">
-                    <span className="text-[11px] text-white font-semibold">
-                      ⭐ 4.9
-                    </span>
+                {isEditing ? (
+                  <div className="flex flex-col gap-1.5">
+                    <input
+                      type="text"
+                      value={draftName}
+                      onChange={(e) => setDraftName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveEdit();
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                      autoFocus
+                      maxLength={30}
+                      placeholder="Your name"
+                      className="bg-white/20 text-white placeholder-white/60 text-lg font-bold rounded-lg px-2 py-1 outline-none focus:bg-white/30 ring-1 ring-white/30 focus:ring-white/60 min-w-0 w-full"
+                    />
+                    <input
+                      type="text"
+                      value={draftUsername}
+                      onChange={(e) => setDraftUsername(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveEdit();
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                      maxLength={30}
+                      placeholder="username"
+                      className="bg-white/15 text-blue-100 placeholder-white/50 text-xs font-medium rounded-lg px-2 py-1 outline-none focus:bg-white/25 ring-1 ring-white/20 focus:ring-white/50 min-w-0 w-full"
+                    />
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-bold text-white truncate">
+                      {hydrated ? name : DEFAULT_NAME}
+                    </h2>
+                    <p className="text-blue-200 text-sm font-medium truncate">
+                      @{hydrated ? username : DEFAULT_USERNAME}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <div className="bg-white/20 px-2 py-0.5 rounded-full">
+                        <span className="text-[11px] text-white font-semibold">
+                          ⭐ 4.9
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-              <Edit
-                className="text-white/80 shrink-0 hover:text-white transition-colors"
-                size={20}
-              />
+              {isEditing ? (
+                <div className="flex flex-col gap-2 shrink-0">
+                  <button
+                    onClick={saveEdit}
+                    aria-label="Save profile"
+                    className="w-8 h-8 rounded-full bg-white/25 hover:bg-white/40 flex items-center justify-center transition-colors"
+                  >
+                    <Check size={16} className="text-white" />
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    aria-label="Cancel edit"
+                    className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 flex items-center justify-center transition-colors"
+                  >
+                    <X size={16} className="text-white" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={startEdit}
+                  aria-label="Edit profile"
+                  className="shrink-0 p-1.5 rounded-full hover:bg-white/20 transition-colors"
+                >
+                  <Edit
+                    className="text-white/80 hover:text-white transition-colors"
+                    size={20}
+                  />
+                </button>
+              )}
             </div>
 
             {/* Stats row */}
@@ -221,18 +333,22 @@ const ProfilePage = () => {
                 </span>
               </li>
             </Link>
-            <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
-              <User className="w-5 h-5 text-gray-400" />
-              <span className="text-[10px] font-semibold text-gray-400">
-                Contacts
-              </span>
-            </li>
-            <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
-              <Users className="w-5 h-5 text-gray-400" />
-              <span className="text-[10px] font-semibold text-gray-400">
-                Friends
-              </span>
-            </li>
+            <Link href="/contacts">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <User className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Contacts
+                </span>
+              </li>
+            </Link>
+            <Link href="/friends">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <Users className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Friends
+                </span>
+              </li>
+            </Link>
             <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl bg-blue-50 transition-colors">
               <UserCircle className="w-5 h-5 text-blue-600" />
               <Link href={"/profile"}>

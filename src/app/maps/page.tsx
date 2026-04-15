@@ -1,6 +1,16 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { Search, X, MapPin, Navigation } from "lucide-react";
+import {
+  Search,
+  X,
+  MapPin,
+  Navigation,
+  Home,
+  Calendar,
+  User,
+  Users,
+  UserCircle,
+} from "lucide-react";
 import Link from "next/link";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -161,7 +171,7 @@ const MapsPage = () => {
         </div>
 
         {/* ── Bottom sheet ── */}
-        <div className="bg-white rounded-t-[2rem] -mt-6 shadow-2xl px-5 pt-3 pb-5 border-t border-gray-100 safe-pb shrink-0">
+        <div className="bg-white rounded-t-[2rem] -mt-6 shadow-2xl px-5 pt-3 pb-5 border-t border-gray-100 shrink-0">
           {/* Drag handle */}
           <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
 
@@ -231,6 +241,50 @@ const MapsPage = () => {
             </div>
           </div>
         </div>
+
+        {/* ── Navigation Bar ── */}
+        <nav className="bg-white border-t border-gray-100 px-4 pt-2 pb-3 safe-pb shrink-0">
+          <ul className="flex justify-between items-center max-w-sm mx-auto">
+            <Link href="/">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <Home className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Home
+                </span>
+              </li>
+            </Link>
+            <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl bg-blue-50 transition-colors">
+              <Calendar className="w-5 h-5 text-blue-600" />
+              <span className="text-[10px] font-bold text-blue-600">
+                Visits
+              </span>
+            </li>
+            <Link href="/contacts">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <User className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Contacts
+                </span>
+              </li>
+            </Link>
+            <Link href="/friends">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <Users className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Friends
+                </span>
+              </li>
+            </Link>
+            <Link href="/profile">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <UserCircle className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Profile
+                </span>
+              </li>
+            </Link>
+          </ul>
+        </nav>
       </div>
     </div>
   );

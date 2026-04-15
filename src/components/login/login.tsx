@@ -67,7 +67,37 @@ export default function SaharaApp() {
   // Get user from URL parameter or localStorage for testing
   const [userId, setUserId] = React.useState<string>("");
   const [userName, setUserName] = React.useState<string>("");
+  const [customName, setCustomName] = React.useState<string>("");
   const [showUserSelector, setShowUserSelector] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const loadCustomName = () => {
+      try {
+        const raw = localStorage.getItem("sahara.profile");
+        if (!raw) {
+          setCustomName("");
+          return;
+        }
+        const parsed = JSON.parse(raw) as { name?: string };
+        setCustomName(parsed.name?.trim() ?? "");
+      } catch {
+        setCustomName("");
+      }
+    };
+    loadCustomName();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "sahara.profile") loadCustomName();
+    };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", loadCustomName);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", loadCustomName);
+    };
+  }, []);
+
+  const displayName = customName || userName || "—";
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -317,7 +347,7 @@ export default function SaharaApp() {
                 Good morning 👋
               </p>
               <h2 className="text-2xl font-bold text-gray-900">
-                Hi, {userName || "—"}!
+                Hi, {displayName}!
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-[11px] text-gray-400 font-mono">{userId}</p>
@@ -526,18 +556,22 @@ export default function SaharaApp() {
                 </span>
               </li>
             </Link>
-            <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
-              <User className="w-5 h-5 text-gray-400" />
-              <span className="text-[10px] font-semibold text-gray-400">
-                Contacts
-              </span>
-            </li>
-            <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
-              <Users className="w-5 h-5 text-gray-400" />
-              <span className="text-[10px] font-semibold text-gray-400">
-                Friends
-              </span>
-            </li>
+            <Link href="/contacts">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <User className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Contacts
+                </span>
+              </li>
+            </Link>
+            <Link href="/friends">
+              <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                <Users className="w-5 h-5 text-gray-400" />
+                <span className="text-[10px] font-semibold text-gray-400">
+                  Friends
+                </span>
+              </li>
+            </Link>
             <Link href={"/profile"}>
               <li className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
                 <UserCircle className="w-5 h-5 text-gray-400" />

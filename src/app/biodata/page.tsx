@@ -1,7 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronLeft, ChevronDown, Calendar } from "lucide-react";
 import Link from "next/link";
+
+const STORAGE_KEY = "sahara.profile";
+const DEFAULT_NAME = "Suhani";
+const DEFAULT_USERNAME = "suhani679";
+const DEFAULT_EMAIL = "suhanihumain@gmail.com";
 
 export default function BioData() {
   const [firstName, setFirstName] = useState("");
@@ -10,9 +15,66 @@ export default function BioData() {
   const [gender, setGender] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [displayName, setDisplayName] = useState(DEFAULT_NAME);
+  const [email, setEmail] = useState(DEFAULT_EMAIL);
+  const [username, setUsername] = useState(DEFAULT_USERNAME);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          name?: string;
+          username?: string;
+          firstName?: string;
+          lastName?: string;
+          phoneNumber?: string;
+          gender?: string;
+          dateOfBirth?: string;
+          email?: string;
+        };
+        if (parsed.firstName !== undefined) setFirstName(parsed.firstName);
+        else if (parsed.name) setFirstName(parsed.name.split(" ")[0] ?? "");
+        if (parsed.lastName !== undefined) setLastName(parsed.lastName);
+        else if (parsed.name) {
+          const rest = parsed.name.split(" ").slice(1).join(" ");
+          setLastName(rest);
+        }
+        if (parsed.phoneNumber) setPhoneNumber(parsed.phoneNumber);
+        if (parsed.gender) setGender(parsed.gender);
+        if (parsed.dateOfBirth) setDateOfBirth(parsed.dateOfBirth);
+        if (parsed.name) setDisplayName(parsed.name);
+        if (parsed.username) setUsername(parsed.username);
+        if (parsed.email) setEmail(parsed.email);
+      }
+    } catch {}
+    setHydrated(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const combinedName =
+      `${firstName.trim()} ${lastName.trim()}`.trim() || DEFAULT_NAME;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const prev = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          ...prev,
+          name: combinedName,
+          username: username || DEFAULT_USERNAME,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phoneNumber,
+          gender,
+          dateOfBirth,
+          email,
+        }),
+      );
+    } catch {}
+    setDisplayName(combinedName);
     setFeedback("Profile updated successfully!");
     setTimeout(() => setFeedback(""), 3000);
   };
@@ -56,8 +118,10 @@ export default function BioData() {
                   </svg>
                 </button>
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Suhani</h2>
-              <p className="text-sm text-gray-400">suhanihumain@gmail.com</p>
+              <h2 className="text-lg font-bold text-gray-900">
+                {hydrated ? displayName : DEFAULT_NAME}
+              </h2>
+              <p className="text-sm text-gray-400">{email}</p>
             </div>
 
             {/* Form */}
