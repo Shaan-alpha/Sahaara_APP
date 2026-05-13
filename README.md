@@ -1,37 +1,159 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sahaara
 
-## Getting Started
+> A modern women’s safety platform with emergency SOS alerts, live location sharing, and trusted-contact notification workflows.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Twilio](https://img.shields.io/badge/Twilio-F22F46?style=for-the-badge&logo=twilio&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+
+## Why Sahaara Exists
+
+Emergency-response tools are often slow, complicated, or dependent on users manually typing messages during high-stress situations.
+
+Sahaara focuses on:
+
+- Fast SOS activation
+- Real-time location visibility
+- Trusted-contact notification systems
+- Mobile-friendly emergency workflows
+- Privacy-conscious design
+
+The goal is to reduce friction during emergencies and create a more accessible safety-support experience.
+
+---
+
+## Key Features
+
+### Emergency SOS Trigger
+Users can activate an emergency alert flow that immediately starts the notification pipeline.
+
+### Live Location Sharing
+Trusted contacts can receive real-time location information to improve response coordination.
+
+### Twilio Alert Integration
+Emergency messages and alerts are delivered using Twilio communication services.
+
+### Interactive Safety Mapping
+MapLibre-powered map views provide location visualization and tracking workflows.
+
+### Modern Full-Stack Architecture
+Built with a scalable frontend stack using Next.js, TypeScript, Tailwind CSS, and Supabase.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js, React, TypeScript |
+| Styling | Tailwind CSS |
+| Backend / BaaS | Supabase |
+| Messaging | Twilio |
+| Maps | MapLibre |
+| Deployment | Vercel |
+
+---
+
+## Architecture Overview
+
+```text
+User Device
+    |
+    v
+Next.js Frontend
+    |
+    +----------------+
+    |                |
+    v                v
+Supabase         Twilio Alerts
+(Database/Auth)  (SMS + emergency notifications)
+    |
+    v
+Trusted Contacts + Live Location Flow
+```
+
+---
+
+## Local Setup
+
+### Prerequisites
+
+- Node.js 18+
+- npm / pnpm / yarn
+- Supabase project
+- Twilio account
+
+### Installation
+
+```bash
+git clone https://github.com/Shaan-alpha/Sahaara_APP.git
+cd Sahaara_APP
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+TWILIO_ACCOUNT_SID=your_twilio_sid
+TWILIO_AUTH_TOKEN=your_twilio_token
+TWILIO_PHONE_NUMBER=your_twilio_phone
+```
+
+### Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+---
 
-## Learn More
+## Product Vision
 
-To learn more about Next.js, take a look at the following resources:
+Sahaara is designed as more than a messaging utility.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The long-term vision includes:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- gesture-based emergency activation
+- AI-assisted risk detection
+- offline-safe fallback workflows
+- wearable integration
+- emergency response escalation layers
+- multilingual accessibility support
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Security & Privacy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# Sahaara_APP
+- Sensitive credentials are managed through environment variables.
+- Personal safety data should never be committed to Git.
+- Production deployments should use HTTPS and secured API routes.
+- Twilio and Supabase keys should be rotated periodically.
+
+---
+
+## Future Improvements
+
+- Push notifications
+- Background location updates
+- Native mobile wrapper
+- Contact verification workflows
+- Incident timeline exports
+- Emergency analytics dashboard
+
+---
+
+## License
+
+MIT License
