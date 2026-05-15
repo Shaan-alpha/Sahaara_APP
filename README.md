@@ -1,3 +1,6 @@
+<!-- HEADER BANNER -->
+![header](https://capsule-render.vercel.app/api?type=waving&color=0:ef4444,50:b91c1c,100:7f1d1d&height=200&section=header&text=Sahaara%20Safety%20Platform&fontSize=52&fontColor=ffffff&fontAlignY=38&desc=Next-Generation%20Emergency%20SOS%20%7C%20Live%20Location%20%7C%20Twilio%20Alerts&descAlignY=60&descSize=18&animation=fadeIn)
+
 # Sahaara
 
 > A modern women’s safety platform with emergency SOS alerts, live location sharing, and trusted-contact notification workflows.
@@ -58,20 +61,15 @@ Built with a scalable frontend stack using Next.js, TypeScript, Tailwind CSS, an
 
 ## Architecture Overview
 
-```text
-User Device
-    |
-    v
-Next.js Frontend
-    |
-    +----------------+
-    |                |
-    v                v
-Supabase         Twilio Alerts
-(Database/Auth)  (SMS + emergency notifications)
-    |
-    v
-Trusted Contacts + Live Location Flow
+```mermaid
+graph TD
+    User[📱 Person in Distress] -->|1. Gesture / SOS Button| Client[⚡ Next.js 14 Web / Mobile PWA]
+    Client -->|2. Geolocation Stream| Supabase[(🗄️ Supabase Postgres / Auth)]
+    Client -->|3. Trigger Emergency API| API[🚀 Next.js Serverless Route]
+    API -->|4. Dispatch SMS & Calls| Twilio[📞 Twilio SMS & Voice Gateway]
+    Twilio -->|5. Instant SOS Alert| TrustedContacts[👥 Trusted Family & Friends]
+    Supabase -->|6. Real-time Map Feed| Map[🗺️ MapLibre Interactive Tracker]
+    TrustedContacts -->|View Live Location| Map
 ```
 
 ---
