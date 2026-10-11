@@ -3,7 +3,7 @@
 
 # Sahaara
 
-> A modern women’s safety platform with emergency SOS alerts, live location sharing, and trusted-contact notification workflows.
+> A modern women’s safety platform with emergency SOS alerts, live location sharing, and a trusted-contacts list with one-tap call and text.
 
 ![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -18,7 +18,7 @@ Sahaara focuses on:
 
 - Fast SOS activation
 - Real-time location visibility
-- Trusted-contact notification systems
+- Nearby-user alert notifications
 - Mobile-friendly emergency workflows
 - Privacy-conscious design
 
@@ -32,7 +32,7 @@ The goal is to reduce friction during emergencies and create a more accessible s
 Users can activate an emergency alert flow that immediately starts the notification pipeline.
 
 ### Live Location Sharing
-Trusted contacts can receive real-time location information to improve response coordination.
+Once location permission is granted, the app keeps your position updated in Supabase, and every SOS alert carries your coordinates with a map link so nearby users can find you.
 
 ### Proximity SOS Broadcast
 Triggering an SOS writes an alert row to Supabase for every online user inside `NEXT_PUBLIC_TRACKING_RADIUS` metres, so the nearest people are reached first.
@@ -62,7 +62,7 @@ Built with a scalable frontend stack using Next.js, TypeScript, Tailwind CSS, an
 
 ```mermaid
 graph TD
-    User[📱 Person in Distress] -->|1. Gesture / SOS Button| Client[⚡ Next.js 14 responsive web app]
+    User[📱 Person in Distress] -->|1. One-tap SOS Button| Client[⚡ Next.js 14 responsive web app]
     Client -->|2. Geolocation Stream| Supabase[(🗄️ Supabase Postgres / Auth)]
     Client -->|3. Trigger Emergency API| API[🚀 Next.js Serverless Route]
     API -->|4. Match online users within radius| Supabase
